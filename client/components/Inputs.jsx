@@ -22,7 +22,7 @@ export default function Inputs({ from, to, onChange, onSearch, routeInfo, isCalc
           name="from"
           value={from}
           onChange={(e) => onChange("from", e.target.value)}
-          placeholder="From"
+          placeholder="Enter starting location (e.g., Delhi, Mumbai, New York)"
           className="w-full rounded-full border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800/70 px-6 py-4 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary text-base"
         />
         <div className="h-4" />
@@ -32,7 +32,7 @@ export default function Inputs({ from, to, onChange, onSearch, routeInfo, isCalc
           name="to"
           value={to}
           onChange={(e) => onChange("to", e.target.value)}
-          placeholder="To"
+          placeholder="Enter destination (e.g., Bangalore, London, Tokyo)"
           className="w-full rounded-full border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800/70 px-6 py-4 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary text-base"
         />
         

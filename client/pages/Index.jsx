@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import MapComponent from "@/components/MapComponent";
+import SimpleMapComponent from "@/components/SimpleMapComponent";
 import Inputs from "@/components/Inputs";
 import Buttons from "@/components/Buttons";
 import UserDropdown from "@/components/UserDropdown";
@@ -15,11 +15,12 @@ export default function Index({ user, onSignOut, onOpenIncidentReport }) {
   const [isCalculatingRoute, setIsCalculatingRoute] = useState(false);
   const [fromLocation, setFromLocation] = useState("");
   const [toLocation, setToLocation] = useState("");
-  const [currentView, setCurrentView] = useState("navigation"); // "navigation", "prediction", "report"
+  const [currentView, setCurrentView] = useState("navigation");
   const [showPredictionPopup, setShowPredictionPopup] = useState(false);
   const [predictionResult, setPredictionResult] = useState(null);
   const [showReportThankYou, setShowReportThankYou] = useState(false);
   const [submittedReport, setSubmittedReport] = useState(null);
+  const [showCarAnimation, setShowCarAnimation] = useState(false);
 
   const handleChange = (field, value) => {
     if (field === "from") setFrom(value);
@@ -29,6 +30,7 @@ export default function Index({ user, onSignOut, onOpenIncidentReport }) {
   const handleSearch = () => {
     if (from && to) {
       setIsCalculatingRoute(true);
+      setShowCarAnimation(false); // Stop any existing animation
       setFromLocation(from);
       setToLocation(to);
       console.log("Calculating route from", from, "to", to);
@@ -38,6 +40,11 @@ export default function Index({ user, onSignOut, onOpenIncidentReport }) {
   const handleRouteCalculated = (info) => {
     setRouteInfo(info);
     setIsCalculatingRoute(false);
+    
+    // Auto-start car animation after 1 second
+    setTimeout(() => {
+      setShowCarAnimation(true);
+    }, 1000);
   };
 
   const handlePredict = () => {
@@ -92,11 +99,12 @@ export default function Index({ user, onSignOut, onOpenIncidentReport }) {
 
   return (
     <main className="relative h-screen w-full bg-background overflow-hidden">
-      <MapComponent 
-        className="absolute inset-0 z-0" 
+            <SimpleMapComponent 
+        className="h-full"
         fromLocation={fromLocation}
-        toLocation={toLocation}
+        toLocation={toLocation} 
         onRouteCalculated={handleRouteCalculated}
+        showCarAnimation={showCarAnimation}
       />
 
       {/* Top brand banner */}
@@ -188,6 +196,11 @@ export default function Index({ user, onSignOut, onOpenIncidentReport }) {
           )}
         </div>
       </div>
+
+      {/* Route Info and Car Controls */}
+      {routeInfo && (
+        <></>
+      )}
 
       {/* Prediction Result Popup */}
       {showPredictionPopup && predictionResult && (
