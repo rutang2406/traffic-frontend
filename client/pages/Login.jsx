@@ -9,15 +9,26 @@ export default function Login({ onLogin, onSwitchToSignup }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Dummy authentication - in real app, this would be an API call
-    if (formData.email && formData.password) {
-      const userData = {
-        name: "Rutang Patel",
-        email: formData.email,
-        avatar: "https://ui-avatars.com/api/?name=Rutang+Patel&background=000&color=fff"
-      };
-      onLogin(userData);
-    }
+    // Real authentication API call
+    fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        onLogin(data.user);
+      } else {
+        alert(data.message || 'Login failed');
+      }
+    })
+    .catch(error => {
+      console.error('Login error:', error);
+      alert('Login failed. Please try again.');
+    });
   };    
 
   const handleChange = (e) => {

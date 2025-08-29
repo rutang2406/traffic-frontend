@@ -10,15 +10,26 @@ export default function Signup({ onSignup, onSwitchToLogin }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Dummy signup - in real app, this would be an API call
-    if (formData.name && formData.email && formData.password) {
-      const userData = {
-        name: formData.name,
-        email: formData.email,
-        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name)}&background=000&color=fff`
-      };
-      onSignup(userData);
-    }
+    // Real signup API call
+    fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        onSignup(data.user);
+      } else {
+        alert(data.message || 'Signup failed');
+      }
+    })
+    .catch(error => {
+      console.error('Signup error:', error);
+      alert('Signup failed. Please try again.');
+    });
   };
 
   const handleChange = (e) => {

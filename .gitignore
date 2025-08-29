@@ -25,3 +25,7 @@ dist-ssr
 
 .config/
 !.env
+
+# User data files (keep private)
+server/data/
+server/data/users.txt
