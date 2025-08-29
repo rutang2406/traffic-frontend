@@ -4,7 +4,7 @@ import Inputs from "@/components/Inputs";
 import Buttons from "@/components/Buttons";
 import UserDropdown from "@/components/UserDropdown";
 
-export default function Index({ user, onSignOut }) {
+export default function Index({ user, onSignOut, onOpenIncidentReport }) {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
 
@@ -19,7 +19,9 @@ export default function Index({ user, onSignOut }) {
 
   const handlePredict = () => console.log("predict");
   const handleCongestion = () => console.log("congestion");
-  const handleReport = () => console.log("report accident");
+  const handleReport = () => {
+    onOpenIncidentReport();
+  };
 
   return (
     <main className="relative h-svh w-full bg-background">
@@ -44,7 +46,11 @@ export default function Index({ user, onSignOut }) {
       <div className="pointer-events-none absolute left-1/2 bottom-6 hidden md:block transform -translate-x-1/2">
         <div className="relative pointer-events-auto">
           <div className="mb-3 flex items-center justify-center gap-3">
-            <Buttons formId="route-form" />
+            <Buttons 
+              onCongestion={handleCongestion}
+              onPrediction={handlePredict}
+              onReport={handleReport}
+            />
           </div>
           <form id="route-form" action="#" method="post" className="w-[50vw] max-w-xl rounded-3xl border border-white/20 bg-white/70 p-6 shadow-2xl backdrop-blur dark:border-white/10 dark:bg-black/40">
             <Inputs from={from} to={to} onChange={handleChange} />
@@ -56,7 +62,11 @@ export default function Index({ user, onSignOut }) {
       <div className="pointer-events-none absolute inset-x-3 bottom-3 md:hidden">
         <form id="route-form-mobile" action="#" method="post" className="pointer-events-auto rounded-2xl border border-white/20 bg-white/80 p-4 shadow-xl backdrop-blur dark:border-white/10 dark:bg-black/40">
           <div className="mb-3 flex items-center justify-center gap-4">
-            <Buttons formId="route-form-mobile" />
+            <Buttons 
+              onCongestion={handleCongestion}
+              onPrediction={handlePredict}
+              onReport={handleReport}
+            />
           </div>
           <Inputs from={from} to={to} onChange={handleChange} />
         </form>

@@ -3,12 +3,14 @@ import React, { useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import IncidentReport from "./pages/IncidentReport";
 import Auth from "./components/Auth";
 import NotFound from "./pages/NotFound";
 
 function App() {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showIncidentReport, setShowIncidentReport] = useState(false);
 
   useEffect(() => {
     // Check if user is already logged in (from localStorage)
@@ -27,6 +29,15 @@ function App() {
   const handleSignOut = () => {
     setUser(null);
     localStorage.removeItem("pravah_user");
+    setShowIncidentReport(false);
+  };
+
+  const handleOpenIncidentReport = () => {
+    setShowIncidentReport(true);
+  };
+
+  const handleCloseIncidentReport = () => {
+    setShowIncidentReport(false);
   };
 
   if (isLoading) {
@@ -42,12 +53,18 @@ function App() {
   }
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Index user={user} onSignOut={handleSignOut} />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
+    <>
+      <Index 
+        user={user} 
+        onSignOut={handleSignOut} 
+        onOpenIncidentReport={handleOpenIncidentReport} 
+      />
+      <IncidentReport 
+        user={user} 
+        onClose={handleCloseIncidentReport} 
+        isOpen={showIncidentReport} 
+      />
+    </>
   );
 }
 
