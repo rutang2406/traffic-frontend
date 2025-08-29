@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import MapComponent from "@/components/MapComponent";
 import Inputs from "@/components/Inputs";
 import Buttons from "@/components/Buttons";
+import UserDropdown from "@/components/UserDropdown";
 
-export default function Index() {
+export default function Index({ user, onSignOut }) {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
 
@@ -32,6 +33,11 @@ export default function Index() {
           className="h-8 w-8 rounded-full object-cover ring-1 ring-black/10"
         />
         <span className="text-sm font-semibold tracking-wide text-slate-800 dark:text-slate-100">Pravah</span>
+      </div>
+
+      {/* User dropdown */}
+      <div className="absolute right-4 top-4 z-10">
+        <UserDropdown user={user} onSignOut={onSignOut} />
       </div>
 
       {/* Desktop / laptop form panel */}
