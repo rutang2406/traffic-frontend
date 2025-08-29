@@ -3,7 +3,10 @@ import MapComponent from "@/components/MapComponent";
 import Inputs from "@/components/Inputs";
 import Buttons from "@/components/Buttons";
 import UserDropdown from "@/components/UserDropdown";
-import PredictionPopup from "@/components/PredictionPopup";
+import PredictionForm from "@/components/PredictionForm";
+import ReportForm from "@/components/ReportForm";
+import PredictionResultPopup from "@/components/PredictionResultPopup";
+import ReportThankYouPopup from "@/components/ReportThankYouPopup";
 
 export default function Index({ user, onSignOut, onOpenIncidentReport }) {
   const [from, setFrom] = useState("");
@@ -12,7 +15,11 @@ export default function Index({ user, onSignOut, onOpenIncidentReport }) {
   const [isCalculatingRoute, setIsCalculatingRoute] = useState(false);
   const [fromLocation, setFromLocation] = useState("");
   const [toLocation, setToLocation] = useState("");
+  const [currentView, setCurrentView] = useState("navigation"); // "navigation", "prediction", "report"
   const [showPredictionPopup, setShowPredictionPopup] = useState(false);
+  const [predictionResult, setPredictionResult] = useState(null);
+  const [showReportThankYou, setShowReportThankYou] = useState(false);
+  const [submittedReport, setSubmittedReport] = useState(null);
 
   const handleChange = (field, value) => {
     if (field === "from") setFrom(value);
@@ -34,23 +41,53 @@ export default function Index({ user, onSignOut, onOpenIncidentReport }) {
   };
 
   const handlePredict = () => {
-    setShowPredictionPopup(true);
+    setCurrentView("prediction");
   };
 
   const handlePredictionSubmit = async (predictionData) => {
     console.log("Prediction requested for:", predictionData);
-    // Here you can call your prediction API
-    // For now, just simulate a prediction
-    alert(`Prediction: Traffic is expected to be moderate on ${predictionData.day} at ${predictionData.time} from ${predictionData.from} to ${predictionData.to}`);
+    
+    // Simulate prediction logic - randomly assign traffic levels
+    const trafficLevels = ['low', 'moderate', 'high'];
+    const randomLevel = trafficLevels[Math.floor(Math.random() * trafficLevels.length)];
+    
+    setPredictionResult({
+      data: predictionData,
+      trafficLevel: randomLevel
+    });
+    setShowPredictionPopup(true);
+    setCurrentView("navigation"); // Go back to navigation view
   };
 
-  const handleClosePredictionPopup = () => {
-    setShowPredictionPopup(false);
+  const handleNavigation = () => {
+    setCurrentView("navigation");
   };
 
-  const handleCongestion = () => console.log("congestion");
   const handleReport = () => {
-    onOpenIncidentReport();
+    setCurrentView("report");
+  };
+
+  const handleReportSubmit = async (reportData) => {
+    console.log("Incident reported:", reportData);
+    
+    // Store the report data and show thank you popup
+    setSubmittedReport(reportData);
+    setShowReportThankYou(true);
+    setCurrentView("navigation"); // Go back to navigation view
+  };
+
+  const handleBackToNavigation = () => {
+    setCurrentView("navigation");
+  };
+
+  const closePredictionPopup = () => {
+    setShowPredictionPopup(false);
+    setPredictionResult(null);
+  };
+
+  const closeReportThankYou = () => {
+    setShowReportThankYou(false);
+    setSubmittedReport(null);
   };
 
   return (
@@ -62,14 +99,17 @@ export default function Index({ user, onSignOut, onOpenIncidentReport }) {
         onRouteCalculated={handleRouteCalculated}
       />
 
-      {/* Top brand bar */}
-      <div className="absolute left-4 top-4 z-[1001] flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 shadow backdrop-blur dark:bg-black/40">
+      {/* Top brand banner */}
+      <div className="absolute left-4 top-4 z-[1001] flex items-center gap-3 rounded-full bg-white shadow-lg px-4 py-2 border border-gray-200">
         <img
           src="https://cdn.builder.io/api/v1/image/assets%2F70e6f5bf64cd4c70b2f1db527b7e88f8%2F6a1cdfc7621e4323a5b54052454108b4?format=webp&width=64"
           alt="Pravah logo"
-          className="h-8 w-8 rounded-full object-cover ring-1 ring-black/10"
+          className="w-10 h-10 rounded-full bg-white border border-gray-200"
         />
-        <span className="text-sm font-semibold tracking-wide text-slate-800 dark:text-slate-100">Pravah</span>
+        <div className="flex flex-col">
+          <span className="font-extrabold text-lg text-gray-900 leading-tight">Pravah</span>
+          <span className="text-xs text-gray-600 -mt-1">Navigate India's Traffic, Smartly</span>
+        </div>
       </div>
 
       {/* User dropdown */}
@@ -82,20 +122,34 @@ export default function Index({ user, onSignOut, onOpenIncidentReport }) {
         <div className="relative pointer-events-auto">
           <div className="mb-3 flex items-center justify-center gap-3">
             <Buttons 
-              onCongestion={handleCongestion}
+              onNavigation={handleNavigation}
               onPrediction={handlePredict}
               onReport={handleReport}
             />
           </div>
           <div className="w-[50vw] max-w-xl rounded-3xl border border-white/20 bg-white/70 p-6 shadow-2xl backdrop-blur dark:border-white/10 dark:bg-black/40">
-            <Inputs 
-              from={from} 
-              to={to} 
-              onChange={handleChange}
-              onSearch={handleSearch}
-              routeInfo={routeInfo}
-              isCalculating={isCalculatingRoute}
-            />
+            {currentView === "navigation" && (
+              <Inputs 
+                from={from} 
+                to={to} 
+                onChange={handleChange}
+                onSearch={handleSearch}
+                routeInfo={routeInfo}
+                isCalculating={isCalculatingRoute}
+              />
+            )}
+            {currentView === "prediction" && (
+              <PredictionForm
+                onBack={handleBackToNavigation}
+                onPredict={handlePredictionSubmit}
+              />
+            )}
+            {currentView === "report" && (
+              <ReportForm
+                onBack={handleBackToNavigation}
+                onReport={handleReportSubmit}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -105,28 +159,54 @@ export default function Index({ user, onSignOut, onOpenIncidentReport }) {
         <div className="pointer-events-auto rounded-2xl border border-white/20 bg-white/80 p-4 shadow-xl backdrop-blur dark:border-white/10 dark:bg-black/40">
           <div className="mb-3 flex items-center justify-center gap-4">
             <Buttons 
-              onCongestion={handleCongestion}
+              onNavigation={handleNavigation}
               onPrediction={handlePredict}
               onReport={handleReport}
             />
           </div>
-          <Inputs 
-            from={from} 
-            to={to} 
-            onChange={handleChange}
-            onSearch={handleSearch}
-            routeInfo={routeInfo}
-            isCalculating={isCalculatingRoute}
-          />
+          {currentView === "navigation" && (
+            <Inputs 
+              from={from} 
+              to={to} 
+              onChange={handleChange}
+              onSearch={handleSearch}
+              routeInfo={routeInfo}
+              isCalculating={isCalculatingRoute}
+            />
+          )}
+          {currentView === "prediction" && (
+            <PredictionForm
+              onBack={handleBackToNavigation}
+              onPredict={handlePredictionSubmit}
+            />
+          )}
+          {currentView === "report" && (
+            <ReportForm
+              onBack={handleBackToNavigation}
+              onReport={handleReportSubmit}
+            />
+          )}
         </div>
       </div>
 
-      {/* Prediction Popup */}
-      <PredictionPopup
-        isOpen={showPredictionPopup}
-        onClose={handleClosePredictionPopup}
-        onPredict={handlePredictionSubmit}
-      />
+      {/* Prediction Result Popup */}
+      {showPredictionPopup && predictionResult && (
+        <PredictionResultPopup
+          isOpen={showPredictionPopup}
+          onClose={closePredictionPopup}
+          predictionData={predictionResult.data}
+          trafficLevel={predictionResult.trafficLevel}
+        />
+      )}
+
+      {/* Report Thank You Popup */}
+      {showReportThankYou && submittedReport && (
+        <ReportThankYouPopup
+          isOpen={showReportThankYou}
+          onClose={closeReportThankYou}
+          reportData={submittedReport}
+        />
+      )}
     </main>
   );
 }

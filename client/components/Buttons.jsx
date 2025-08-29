@@ -1,6 +1,6 @@
 import React from "react";
 import BrainCircuit from "lucide-react/dist/esm/icons/brain-circuit";
-import TrafficCone from "lucide-react/dist/esm/icons/traffic-cone";
+import Navigation from "lucide-react/dist/esm/icons/navigation";
 import AlertTriangle from "lucide-react/dist/esm/icons/alert-triangle";
 
 function Action({ label, Icon, onClick }) {
@@ -19,10 +19,10 @@ function Action({ label, Icon, onClick }) {
   );
 }
 
-export default function Buttons({ orientation = "horizontal", onCongestion, onPrediction, onReport, className = "" }) {
+export default function Buttons({ orientation = "horizontal", onNavigation, onPrediction, onReport, className = "" }) {
   return (
     <div className={(orientation === "vertical" ? "flex-col" : "flex-row") + " flex gap-3 sm:gap-4 " + className}>
-      <Action label="Congestion" Icon={TrafficCone} onClick={onCongestion} />
+      <Action label="Navigation" Icon={Navigation} onClick={onNavigation} />
       <Action label="Prediction" Icon={BrainCircuit} onClick={onPrediction} />
       <Action label="Report" Icon={AlertTriangle} onClick={onReport} />
     </div>
