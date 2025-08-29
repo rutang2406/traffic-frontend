@@ -21,10 +21,13 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@googlemaps/js-api-loader": "^1.16.10",
+    "@googlemaps/react-wrapper": "^1.2.0",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "leaflet": "^1.9.4",
-    "react-leaflet": "^4.2.1",
+    "leaflet-routing-machine": "^3.2.12",
+    "react-leaflet": "^5.0.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {

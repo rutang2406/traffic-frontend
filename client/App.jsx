@@ -13,7 +13,7 @@ function App() {
   const [showIncidentReport, setShowIncidentReport] = useState(false);
 
   useEffect(() => {
-    // Check if user is already logged in (from localStorage)
+    
     const savedUser = localStorage.getItem("pravah_user");
     if (savedUser) {
       setUser(JSON.parse(savedUser));

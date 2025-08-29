@@ -168,11 +168,22 @@ export default function IncidentReport({ user, onClose, isOpen }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div 
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      onClick={(e) => {
+        // Close modal if clicking on backdrop
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
       {/* Modal Container */}
-      <div className="relative w-full max-w-2xl max-h-[90vh] bg-white rounded-xl shadow-2xl overflow-hidden">
+      <div 
+        className="relative w-full max-w-2xl max-h-[90vh] bg-white rounded-xl shadow-2xl overflow-hidden"
+        onClick={(e) => e.stopPropagation()} // Prevent modal close when clicking inside
+      >
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-4 sm:p-6">
+        <div className="sticky top-0 bg-white border-b border-gray-200 p-4 sm:p-6 z-10">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Report Incident</h2>
@@ -193,10 +204,10 @@ export default function IncidentReport({ user, onClose, isOpen }) {
         </div>
 
         {/* Scrollable Content */}
-        <div className="overflow-y-auto max-h-[calc(90vh-80px)]">
+        <div className="overflow-y-auto max-h-[calc(90vh-120px)]">
           <div className="p-4 sm:p-6">
             {/* Form */}
-            <form action="#" method="post" onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               {/* Road Segment */}
               <div>
                 <label htmlFor="roadSegment" className="block text-sm font-medium text-gray-700 mb-2">
@@ -259,6 +270,7 @@ export default function IncidentReport({ user, onClose, isOpen }) {
                   className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-vertical text-sm sm:text-base ${
                     errors.description ? 'border-red-500' : 'border-gray-300'
                   }`}
+                  maxLength={500}
                 />
                 {errors.description && (
                   <p className="mt-1 text-sm text-red-600">{errors.description}</p>
@@ -290,12 +302,22 @@ export default function IncidentReport({ user, onClose, isOpen }) {
                 </p>
               </div>
 
+              {/* Reporter Info */}
+              <div className="bg-blue-50 rounded-lg p-3 sm:p-4">
+                <h3 className="text-sm font-medium text-blue-900 mb-2">Reporter Information</h3>
+                <div className="text-xs sm:text-sm text-blue-700 space-y-1">
+                  <p><span className="font-medium">Name:</span> {user.name}</p>
+                  <p><span className="font-medium">Email:</span> {user.email}</p>
+                  <p><span className="font-medium">Time:</span> {new Date().toLocaleString()}</p>
+                </div>
+              </div>
+
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 pt-4">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full sm:w-auto px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base"
+                  className="w-full sm:flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base"
                 >
                   {isSubmitting ? 'Submitting...' : 'SAVE'}
                 </button>
@@ -304,7 +326,7 @@ export default function IncidentReport({ user, onClose, isOpen }) {
                   type="button"
                   onClick={handleSaveAndAddAnother}
                   disabled={isSubmitting}
-                  className="w-full sm:w-auto px-6 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base"
+                  className="w-full sm:flex-1 px-6 py-3 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base"
                 >
                   Save and add another
                 </button>
@@ -313,22 +335,12 @@ export default function IncidentReport({ user, onClose, isOpen }) {
                   type="button"
                   onClick={onClose}
                   disabled={isSubmitting}
-                  className="w-full sm:w-auto px-6 py-2 bg-gray-300 text-gray-700 font-medium rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base"
+                  className="w-full sm:flex-1 px-6 py-3 bg-gray-300 text-gray-700 font-medium rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base"
                 >
                   Cancel
                 </button>
               </div>
             </form>
-
-            {/* Reporter Info */}
-            <div className="bg-blue-50 rounded-lg p-3 sm:p-4 mt-6">
-              <h3 className="text-sm font-medium text-blue-900 mb-2">Reporter Information</h3>
-              <div className="text-xs sm:text-sm text-blue-700 space-y-1">
-                <p><span className="font-medium">Name:</span> {user.name}</p>
-                <p><span className="font-medium">Email:</span> {user.email}</p>
-                <p><span className="font-medium">Time:</span> {new Date().toLocaleString()}</p>
-              </div>
-            </div>
           </div>
         </div>
       </div>

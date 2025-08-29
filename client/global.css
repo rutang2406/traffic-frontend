@@ -1,6 +1,10 @@
 /** @import must precede all other statements */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap");
 
+/* Leaflet CSS imports */
+@import 'leaflet/dist/leaflet.css';
+@import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -89,6 +93,17 @@
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+}
+
+/* Custom styles for Leaflet route markers */
+.custom-route-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Enhanced route line styling */
+.leaflet-routing-container {
+  display: none; /* Hide the routing instructions panel */
 }
 
 @layer base {
