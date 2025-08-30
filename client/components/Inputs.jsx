@@ -256,20 +256,6 @@ export default function Inputs({ from, to, onChange, onSearch, routeInfo, isCalc
           )}
         </div>
         
-        {/* Route Information */}
-        {routeInfo && (
-          <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-2xl">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-blue-600 dark:text-blue-400 font-medium">
-                ETA: {routeInfo.duration}
-              </span>
-              <span className="text-slate-600 dark:text-slate-400">
-                Distance: {routeInfo.distance}
-              </span>
-            </div>
-          </div>
-        )}
-        
         <div className="mt-4 flex justify-end">
           <button
             type="submit"
