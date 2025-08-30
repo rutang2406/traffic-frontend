@@ -233,97 +233,68 @@ const MapComponent = ({ className = "", fromLocation, toLocation, onRouteCalcula
   // Function to find intersections along route with random spacing
   const findIntersectionsOnRoute = (route) => {
     const intersections = [];
-    
     try {
       // Get route coordinates from the route geometry
       let coordinates = null;
-      
-      // Try different ways to access coordinates based on OSRM response structure
       if (route.coordinates && route.coordinates.length > 0) {
         coordinates = route.coordinates;
       } else if (route.geometry && route.geometry.coordinates) {
         coordinates = route.geometry.coordinates;
       } else if (route.waypoints && route.waypoints.length > 0) {
-        // Fallback: create simple path between waypoints
         coordinates = route.waypoints.map(wp => [wp.location[0], wp.location[1]]);
       }
-      
+      // Helper function: simple city check (for demo, use zoom level or bounding box)
+      const isCityIntersection = (lat, lng) => {
+        // Example: Only allow traffic lights in Delhi bounding box (city area)
+        // You can replace this with a more accurate city/intersection check using OSM or API
+        return (
+          lat > 28.40 && lat < 28.90 &&
+          lng > 76.80 && lng < 77.40
+        );
+      };
       if (coordinates && coordinates.length > 0) {
-        // Calculate total route distance first
         let totalRouteDistance = 0;
         for (let i = 1; i < coordinates.length; i++) {
           const prevCoord = coordinates[i - 1];
           const currentCoord = coordinates[i];
-          
           const prevLat = Array.isArray(prevCoord) ? prevCoord[1] : prevCoord.lat;
           const prevLng = Array.isArray(prevCoord) ? prevCoord[0] : prevCoord.lng;
           const currentLat = Array.isArray(currentCoord) ? currentCoord[1] : currentCoord.lat;
           const currentLng = Array.isArray(currentCoord) ? currentCoord[0] : currentCoord.lng;
-          
-          const distance = L.latLng(prevLat, prevLng).distanceTo(
-            L.latLng(currentLat, currentLng)
-          );
+          const distance = L.latLng(prevLat, prevLng).distanceTo(L.latLng(currentLat, currentLng));
           totalRouteDistance += distance;
         }
-
-        // Determine number of traffic lights based on route length (every 500-800m)
         const avgSpacing = 650; // meters
         const numTrafficLights = Math.max(3, Math.min(12, Math.floor(totalRouteDistance / avgSpacing)));
-        
-        // Calculate equal spacing intervals
         const equalSpacing = totalRouteDistance / (numTrafficLights + 1);
-        
         let accumulatedDistance = 0;
         let nextTarget = equalSpacing;
         let trafficLightIndex = 0;
-        
         for (let i = 1; i < coordinates.length && trafficLightIndex < numTrafficLights; i++) {
           const prevCoord = coordinates[i - 1];
           const currentCoord = coordinates[i];
-          
-          // Handle both [lng, lat] and [lat, lng] formats
-          const prevLat = Array.isArray(prevCoord) ? prevCoord[1] : prevCoord.lat;
-          const prevLng = Array.isArray(prevCoord) ? prevCoord[0] : prevCoord.lng;
           const currentLat = Array.isArray(currentCoord) ? currentCoord[1] : currentCoord.lat;
           const currentLng = Array.isArray(currentCoord) ? currentCoord[0] : currentCoord.lng;
-          
-          // Calculate distance between points using Leaflet's distance function
-          const distance = L.latLng(prevLat, prevLng).distanceTo(
-            L.latLng(currentLat, currentLng)
-          );
-          
+          const prevLat = Array.isArray(prevCoord) ? prevCoord[1] : prevCoord.lat;
+          const prevLng = Array.isArray(prevCoord) ? prevCoord[0] : prevCoord.lng;
+          const distance = L.latLng(prevLat, prevLng).distanceTo(L.latLng(currentLat, currentLng));
           accumulatedDistance += distance;
-          
-          // Add intersection when we reach the target distance
-          if (accumulatedDistance >= nextTarget) {
-            intersections.push({
-              lat: currentLat,
-              lng: currentLng
-            });
+          // Only add intersection if it's in the city area
+          if (accumulatedDistance >= nextTarget && isCityIntersection(currentLat, currentLng)) {
+            intersections.push({ lat: currentLat, lng: currentLng });
             trafficLightIndex++;
-            nextTarget += equalSpacing; // Next equally spaced target
+            nextTarget += equalSpacing;
           }
         }
-        
-        // Ensure we have at least one traffic light near the middle if none were added
-        if (intersections.length === 0 && coordinates.length > 0) {
-          const middleIndex = Math.floor(coordinates.length / 2);
-          const middleCoord = coordinates[middleIndex];
-          const lat = Array.isArray(middleCoord) ? middleCoord[1] : middleCoord.lat;
-          const lng = Array.isArray(middleCoord) ? middleCoord[0] : middleCoord.lng;
-          intersections.push({ lat, lng });
-        }
-        
-        // Remove the max lights limitation since we're calculating optimal distribution
+        // If no intersections found, do not add any traffic lights (no city intersections)
         console.log(`Total route distance: ${(totalRouteDistance/1000).toFixed(2)}km`);
         console.log(`Planned ${numTrafficLights} traffic lights with ${(equalSpacing).toFixed(0)}m spacing`);
-        console.log(`Actually placed ${intersections.length} traffic lights evenly distributed`);
+        console.log(`Actually placed ${intersections.length} city traffic lights`);
       }
     } catch (error) {
       console.error('Error finding intersections:', error);
     }
-    
-    console.log(`Generated ${intersections.length} evenly distributed city traffic lights`);
+    console.log(`Generated ${intersections.length} city traffic lights`);
     return intersections;
   };
 

@@ -8,11 +8,8 @@ export default function PredictionForm({ onBack, onPredict }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (from && coords) {
+    if (coords) {
       onPredict({ location: from, coords, radius: 1 }); // radius in km
-      // Reset form
-      setFrom('');
-      setCoords(null);
       // Don't go back immediately - let the popup show first
     }
   };
@@ -61,14 +58,11 @@ export default function PredictionForm({ onBack, onPredict }) {
       </div>
 
       <div className="grid grid-cols-1 gap-4">
-        <input
-          type="text"
-          placeholder="Current location"
-          value={from}
-          className="w-full px-4 py-3 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          required
-          readOnly
-        />
+        {/* Show user's current location */}
+        <div className="w-full px-4 py-3 bg-white border border-gray-200 rounded-2xl text-gray-700 text-base">
+          <span className="font-medium">Current Location:</span>
+          <span className="ml-2">{from}</span>
+        </div>
 
   {/* Removed day and time fields */}
 

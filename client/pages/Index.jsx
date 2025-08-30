@@ -146,32 +146,37 @@ export default function Index({ user, onSignOut, onOpenIncidentReport }) {
               onReport={handleReport}
             />
           </div>
-          {!routeInfo && (
-            <div className="w-[50vw] max-w-xl rounded-3xl border border-white/20 bg-white/70 p-6 shadow-2xl backdrop-blur dark:border-white/10 dark:bg-black/40">
-              {currentView === "navigation" && (
-                <Inputs 
-                  from={from} 
-                  to={to} 
-                  onChange={handleChange}
-                  onSearch={handleSearch}
-                  routeInfo={routeInfo}
-                  isCalculating={isCalculatingRoute}
-                />
-              )}
-              {currentView === "prediction" && (
-                <PredictionForm
-                  onBack={handleBackToNavigation}
-                  onPredict={handlePredictionSubmit}
-                />
-              )}
-              {currentView === "report" && (
-                <ReportForm
-                  onBack={handleBackToNavigation}
-                  onReport={handleReportSubmit}
-                />
-              )}
+          {routeInfo && (
+            <div className="mb-3 flex items-center justify-center">
+              <div className="px-6 py-2 rounded-full bg-white/80 shadow text-base font-medium text-gray-800 border border-gray-200">
+                Distance: {routeInfo.distance} &nbsp;|&nbsp; Estimated Time: {routeInfo.duration}
+              </div>
             </div>
           )}
+          <div className="w-[50vw] max-w-xl rounded-3xl border border-white/20 bg-white/70 p-6 shadow-2xl backdrop-blur dark:border-white/10 dark:bg-black/40">
+            {currentView === "navigation" && !routeInfo && (
+              <Inputs 
+                from={from} 
+                to={to} 
+                onChange={handleChange}
+                onSearch={handleSearch}
+                routeInfo={routeInfo}
+                isCalculating={isCalculatingRoute}
+              />
+            )}
+            {currentView === "prediction" && (
+              <PredictionForm
+                onBack={handleBackToNavigation}
+                onPredict={handlePredictionSubmit}
+              />
+            )}
+            {currentView === "report" && (
+              <ReportForm
+                onBack={handleBackToNavigation}
+                onReport={handleReportSubmit}
+              />
+            )}
+          </div>
         </div>
       </div>
 
@@ -185,9 +190,16 @@ export default function Index({ user, onSignOut, onOpenIncidentReport }) {
               onReport={handleReport}
             />
           </div>
-          {!routeInfo && (
+          {routeInfo && (
+            <div className="mb-3 flex items-center justify-center">
+              <div className="px-6 py-2 rounded-full bg-white/80 shadow text-base font-medium text-gray-800 border border-gray-200">
+                Distance: {routeInfo.distance} &nbsp;|&nbsp; Estimated Time: {routeInfo.duration}
+              </div>
+            </div>
+          )}
+          {((currentView === "navigation" && !routeInfo) || currentView === "prediction" || currentView === "report") && (
             <>
-              {currentView === "navigation" && (
+              {currentView === "navigation" && !routeInfo && (
                 <Inputs 
                   from={from} 
                   to={to} 

@@ -43,17 +43,24 @@ export default function Inputs({ from, to, onChange, onSearch, routeInfo, isCalc
     setIsLoading(true);
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=5&q=${encodeURIComponent(query)}`
+        `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=5&countrycodes=IN&q=${encodeURIComponent(query)}`
       );
       const data = await response.json();
       
-      const suggestions = data.map(item => ({
-        display_name: item.display_name,
-        name: item.name || item.display_name.split(',')[0],
-        lat: parseFloat(item.lat),
-        lon: parseFloat(item.lon)
-      }));
-      
+      // Filter out duplicate display_names
+      const seen = new Set();
+      const suggestions = data
+        .map(item => ({
+          display_name: item.display_name,
+          name: item.name || item.display_name.split(',')[0],
+          lat: parseFloat(item.lat),
+          lon: parseFloat(item.lon)
+        }))
+        .filter(suggestion => {
+          if (seen.has(suggestion.display_name)) return false;
+          seen.add(suggestion.display_name);
+          return true;
+        });
       setSuggestions(suggestions);
     } catch (error) {
       console.error('Error fetching suggestions:', error);

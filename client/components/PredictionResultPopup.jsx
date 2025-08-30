@@ -3,6 +3,8 @@ import X from 'lucide-react/dist/esm/icons/x';
 
 export default function PredictionResultPopup({ isOpen, onClose, predictionData, trafficLevel }) {
   if (!isOpen) return null;
+  const level = trafficLevel?.toLowerCase();
+  if (level !== 'moderate' && level !== 'high') return null;
 
   const getTrafficColor = (level) => {
     switch (level.toLowerCase()) {
@@ -48,21 +50,7 @@ export default function PredictionResultPopup({ isOpen, onClose, predictionData,
 
         {/* Content */}
         <div className="p-6">
-          {/* Route Info */}
-          <div className="mb-6">
-            <div className="text-sm text-gray-600 mb-2">Route</div>
-            <div className="font-medium text-gray-900">
-              {predictionData.from} → {predictionData.to}
-            </div>
-          </div>
-
-          {/* Time Info */}
-          <div className="mb-6">
-            <div className="text-sm text-gray-600 mb-2">Prediction Time</div>
-            <div className="font-medium text-gray-900">
-              {predictionData.day} at {predictionData.time}
-            </div>
-          </div>
+          {/* Removed Route and Prediction Time Info */}
 
           {/* Traffic Level */}
           <div className={`${colors.bg} ${colors.border} border-2 rounded-xl p-4 mb-6`}>
