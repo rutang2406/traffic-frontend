@@ -21,6 +21,7 @@ export default function Index({ user, onSignOut, onOpenIncidentReport }) {
   const [showReportThankYou, setShowReportThankYou] = useState(false);
   const [submittedReport, setSubmittedReport] = useState(null);
   const [showCarAnimation, setShowCarAnimation] = useState(false);
+  const [isFormExpanded, setIsFormExpanded] = useState(false);
 
   const handleChange = (field, value) => {
     if (field === "from") setFrom(value);
@@ -40,6 +41,7 @@ export default function Index({ user, onSignOut, onOpenIncidentReport }) {
   const handleRouteCalculated = (info) => {
     setRouteInfo(info);
     setIsCalculatingRoute(false);
+    setIsFormExpanded(false); // Reset form to minimized state
     
     // Auto-start car animation after 1 second
     setTimeout(() => {
@@ -85,6 +87,14 @@ export default function Index({ user, onSignOut, onOpenIncidentReport }) {
 
   const handleBackToNavigation = () => {
     setCurrentView("navigation");
+  };
+
+  const handleModifyRoute = () => {
+    setIsFormExpanded(true);
+  };
+
+  const handleMinimizeForm = () => {
+    setIsFormExpanded(false);
   };
 
   const closePredictionPopup = () => {
@@ -135,16 +145,54 @@ export default function Index({ user, onSignOut, onOpenIncidentReport }) {
               onReport={handleReport}
             />
           </div>
-          <div className="w-[50vw] max-w-xl rounded-3xl border border-white/20 bg-white/70 p-6 shadow-2xl backdrop-blur dark:border-white/10 dark:bg-black/40">
+          <div className={`transition-all duration-300 ease-in-out rounded-3xl border border-white/20 bg-white/70 shadow-2xl backdrop-blur dark:border-white/10 dark:bg-black/40 ${
+            routeInfo && currentView === "navigation" && !isFormExpanded
+              ? "w-auto max-w-md p-3" 
+              : "w-[50vw] max-w-xl p-6"
+          }`}>
             {currentView === "navigation" && (
-              <Inputs 
-                from={from} 
-                to={to} 
-                onChange={handleChange}
-                onSearch={handleSearch}
-                routeInfo={routeInfo}
-                isCalculating={isCalculatingRoute}
-              />
+              <>
+                {routeInfo && !isFormExpanded ? (
+                  // Minimized route info display
+                  <div className="text-center">
+                    <div className="flex items-center justify-between text-sm mb-2">
+                      <span className="text-blue-600 dark:text-blue-400 font-medium ">
+                        ETA: {routeInfo.duration}
+                      </span>
+                      <span className="text-slate-600 dark:text-slate-400">
+                        Distance: {routeInfo.distance}
+                      </span>
+                    </div>
+                    <button
+                      onClick={handleModifyRoute}
+                      className="text-s text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
+                    >
+                      Click to modify route
+                    </button>
+                  </div>
+                ) : (
+                  // Full input form (either no route or expanded)
+                  <div className="relative">
+                    {routeInfo && isFormExpanded && (
+                      <button
+                        onClick={handleMinimizeForm}
+                        className="absolute top-0 right-0 -mt-2 -mr-2 w-6 h-6 bg-slate-500 hover:bg-slate-600 text-white rounded-full flex items-center justify-center text-sm font-bold transition-colors z-10"
+                        title="Minimize form"
+                      >
+                        ×
+                      </button>
+                    )}
+                    <Inputs 
+                      from={from} 
+                      to={to} 
+                      onChange={handleChange}
+                      onSearch={handleSearch}
+                      routeInfo={routeInfo}
+                      isCalculating={isCalculatingRoute}
+                    />
+                  </div>
+                )}
+              </>
             )}
             {currentView === "prediction" && (
               <PredictionForm
@@ -164,7 +212,9 @@ export default function Index({ user, onSignOut, onOpenIncidentReport }) {
 
       {/* Mobile layout: buttons centered above inputs */}
       <div className="pointer-events-none absolute inset-x-3 bottom-3 md:hidden z-[1001]">
-        <div className="pointer-events-auto rounded-2xl border border-white/20 bg-white/80 p-4 shadow-xl backdrop-blur dark:border-white/10 dark:bg-black/40">
+        <div className={`pointer-events-auto transition-all duration-300 ease-in-out rounded-2xl border border-white/20 bg-white/80 shadow-xl backdrop-blur dark:border-white/10 dark:bg-black/40 ${
+          routeInfo && currentView === "navigation" && !isFormExpanded ? "p-3" : "p-4"
+        }`}>
           <div className="mb-3 flex items-center justify-center gap-4">
             <Buttons 
               onNavigation={handleNavigation}
@@ -173,14 +223,48 @@ export default function Index({ user, onSignOut, onOpenIncidentReport }) {
             />
           </div>
           {currentView === "navigation" && (
-            <Inputs 
-              from={from} 
-              to={to} 
-              onChange={handleChange}
-              onSearch={handleSearch}
-              routeInfo={routeInfo}
-              isCalculating={isCalculatingRoute}
-            />
+            <>
+              {routeInfo && !isFormExpanded ? (
+                // Minimized route info display for mobile
+                <div className="text-center">
+                  <div className="flex items-center justify-between text-sm mb-2">
+                    <span className="text-blue-600 dark:text-blue-400 font-medium">
+                      ETA: {routeInfo.duration}
+                    </span>
+                    <span className="text-slate-600 dark:text-slate-400">
+                      Distance: {routeInfo.distance}
+                    </span>
+                  </div>
+                  <button
+                    onClick={handleModifyRoute}
+                    className="text-xs text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
+                  >
+                    Tap to modify route
+                  </button>
+                </div>
+              ) : (
+                // Full input form for mobile (either no route or expanded)
+                <div className="relative">
+                  {routeInfo && isFormExpanded && (
+                    <button
+                      onClick={handleMinimizeForm}
+                      className="absolute top-0 right-0 -mt-2 -mr-2 w-6 h-6 bg-slate-500 hover:bg-slate-600 text-white rounded-full flex items-center justify-center text-sm font-bold transition-colors z-10"
+                      title="Minimize form"
+                    >
+                      ×
+                    </button>
+                  )}
+                  <Inputs 
+                    from={from} 
+                    to={to} 
+                    onChange={handleChange}
+                    onSearch={handleSearch}
+                    routeInfo={routeInfo}
+                    isCalculating={isCalculatingRoute}
+                  />
+                </div>
+              )}
+            </>
           )}
           {currentView === "prediction" && (
             <PredictionForm
