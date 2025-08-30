@@ -1,26 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left';
 
 export default function PredictionForm({ onBack, onPredict }) {
   const [from, setFrom] = useState('');
-  const [to, setTo] = useState('');
-  const [day, setDay] = useState('');
-  const [time, setTime] = useState('');
+  const [coords, setCoords] = useState(null);
+  // Removed day and time fields
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (from && to && day && time) {
-      onPredict({ from, to, day, time });
+    if (from && coords) {
+      onPredict({ location: from, coords, radius: 1 }); // radius in km
       // Reset form
       setFrom('');
-      setTo('');
-      setDay('');
-      setTime('');
+      setCoords(null);
       // Don't go back immediately - let the popup show first
     }
   };
+  // Auto-fetch user's current location and address
+  useEffect(() => {
+    if (from) return;
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const { latitude, longitude } = pos.coords;
+          setCoords({ latitude, longitude });
+          try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+            const data = await response.json();
+            if (data && data.display_name) {
+              setFrom(data.display_name);
+            } else {
+              setFrom(`${latitude}, ${longitude}`);
+            }
+          } catch (error) {
+            setFrom(`${latitude}, ${longitude}`);
+          }
+        },
+        (err) => {
+          setFrom('Unable to fetch location');
+        }
+      );
+    } else {
+      setFrom('Geolocation not supported');
+    }
+  }, []);
 
-  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  // Removed days array
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -38,41 +63,14 @@ export default function PredictionForm({ onBack, onPredict }) {
       <div className="grid grid-cols-1 gap-4">
         <input
           type="text"
-          placeholder="From location"
+          placeholder="Current location"
           value={from}
-          onChange={(e) => setFrom(e.target.value)}
           className="w-full px-4 py-3 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           required
+          readOnly
         />
 
-        <input
-          type="text"
-          placeholder="To location"
-          value={to}
-          onChange={(e) => setTo(e.target.value)}
-          className="w-full px-4 py-3 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          required
-        />
-
-        <select
-          value={day}
-          onChange={(e) => setDay(e.target.value)}
-          className="w-full px-4 py-3 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          required
-        >
-          <option value="">Select day</option>
-          {days.map((dayName) => (
-            <option key={dayName} value={dayName}>{dayName}</option>
-          ))}
-        </select>
-
-        <input
-          type="time"
-          value={time}
-          onChange={(e) => setTime(e.target.value)}
-          className="w-full px-4 py-3 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          required
-        />
+  {/* Removed day and time fields */}
 
         <button
           type="submit"

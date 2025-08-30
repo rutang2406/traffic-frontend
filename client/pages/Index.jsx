@@ -125,17 +125,56 @@ export default function Index({ user, onSignOut, onOpenIncidentReport }) {
         <UserDropdown user={user} onSignOut={onSignOut} />
       </div>
 
-      {/* Desktop / laptop form panel */}
-      <div className="pointer-events-none absolute left-1/2 bottom-6 hidden md:block transform -translate-x-1/2 z-[1001]">
-        <div className="relative pointer-events-auto">
-          <div className="mb-3 flex items-center justify-center gap-3">
-            <Buttons 
-              onNavigation={handleNavigation}
-              onPrediction={handlePredict}
-              onReport={handleReport}
-            />
+      {/* Desktop / laptop form panel - hide when prediction result is shown */}
+      {!showPredictionPopup && (
+        <div className="pointer-events-none absolute left-1/2 bottom-6 hidden md:block transform -translate-x-1/2 z-[1001]">
+          <div className="relative pointer-events-auto">
+            <div className="mb-3 flex items-center justify-center gap-3">
+              <Buttons 
+                onNavigation={handleNavigation}
+                onPrediction={handlePredict}
+                onReport={handleReport}
+              />
+            </div>
+            <div className="w-[50vw] max-w-xl rounded-3xl border border-white/20 bg-white/70 p-6 shadow-2xl backdrop-blur dark:border-white/10 dark:bg-black/40">
+              {currentView === "navigation" && (
+                <Inputs 
+                  from={from} 
+                  to={to} 
+                  onChange={handleChange}
+                  onSearch={handleSearch}
+                  routeInfo={routeInfo}
+                  isCalculating={isCalculatingRoute}
+                />
+              )}
+              {currentView === "prediction" && (
+                <PredictionForm
+                  onBack={handleBackToNavigation}
+                  onPredict={handlePredictionSubmit}
+                />
+              )}
+              {currentView === "report" && (
+                <ReportForm
+                  onBack={handleBackToNavigation}
+                  onReport={handleReportSubmit}
+                />
+              )}
+            </div>
           </div>
-          <div className="w-[50vw] max-w-xl rounded-3xl border border-white/20 bg-white/70 p-6 shadow-2xl backdrop-blur dark:border-white/10 dark:bg-black/40">
+        </div>
+      )}
+
+      {/* Mobile layout: buttons centered above inputs - hide when prediction result is shown */}
+      {!showPredictionPopup && (
+        <div className="pointer-events-none absolute inset-x-3 bottom-3 md:hidden z-[1001]">
+          <div className="pointer-events-auto rounded-2xl border border-white/20 bg-white/80 p-4 shadow-xl backdrop-blur dark:border-white/10 dark:bg-black/40">
+            <div className="mb-3 flex items-center justify-center gap-4">
+              <Buttons 
+                onNavigation={handleNavigation}
+                onPrediction={handlePredict}
+                onReport={handleReport}
+              />
+            </div>
             {currentView === "navigation" && (
               <Inputs 
                 from={from} 
@@ -160,42 +199,7 @@ export default function Index({ user, onSignOut, onOpenIncidentReport }) {
             )}
           </div>
         </div>
-      </div>
-
-      {/* Mobile layout: buttons centered above inputs */}
-      <div className="pointer-events-none absolute inset-x-3 bottom-3 md:hidden z-[1001]">
-        <div className="pointer-events-auto rounded-2xl border border-white/20 bg-white/80 p-4 shadow-xl backdrop-blur dark:border-white/10 dark:bg-black/40">
-          <div className="mb-3 flex items-center justify-center gap-4">
-            <Buttons 
-              onNavigation={handleNavigation}
-              onPrediction={handlePredict}
-              onReport={handleReport}
-            />
-          </div>
-          {currentView === "navigation" && (
-            <Inputs 
-              from={from} 
-              to={to} 
-              onChange={handleChange}
-              onSearch={handleSearch}
-              routeInfo={routeInfo}
-              isCalculating={isCalculatingRoute}
-            />
-          )}
-          {currentView === "prediction" && (
-            <PredictionForm
-              onBack={handleBackToNavigation}
-              onPredict={handlePredictionSubmit}
-            />
-          )}
-          {currentView === "report" && (
-            <ReportForm
-              onBack={handleBackToNavigation}
-              onReport={handleReportSubmit}
-            />
-          )}
-        </div>
-      </div>
+      )}
 
       {/* Route Info and Car Controls */}
       {routeInfo && (
